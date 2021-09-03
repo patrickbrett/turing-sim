@@ -50,29 +50,29 @@ def parking_meter():
 
 
 """
-FSM that decides if a string contains an even number of 1's.
+FSM that decides if a string contains an even number of B's.
 """
 def even_ones():
-  Q = set(['0', '1'])
-  sigma = set(['0', '1'])
-  q0 = '0'
-  F = set(['0'])
+  Q = set(['X', 'Y'])
+  sigma = set(['A', 'B'])
+  q0 = 'X'
+  F = set(['X'])
   delta = {
-    ('0', '0'): '0',
-    ('0', '1'): '1',
-    ('1', '0'): '1',
-    ('1', '1'): '0'
+    ('X', 'A'): 'X',
+    ('X', 'B'): 'Y',
+    ('Y', 'A'): 'Y',
+    ('Y', 'B'): 'X'
   }
   return FiniteStateMachine(Q, sigma, q0, F, delta)
 
 
 if __name__ == '__main__':
   # Parking meter example
-  example_input = [5, 5, 10]
-  output = run_fsm(parking_meter(), example_input)
-  print(f'Parking meter: {output}')
+  # example_input = [20, 20]
+  # output = run_fsm(parking_meter(), example_input)
+  # print(f'Parking meter: {output}')
 
   # Count ones example
-  example_input = "0111010101"
+  example_input = "ABBABABABBABB"
   output = run_fsm(even_ones(), example_input)
   print(f'Count ones: {output}')
