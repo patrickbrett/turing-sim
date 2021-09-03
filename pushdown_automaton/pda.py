@@ -79,33 +79,25 @@ def run_pda_nondeterministic(pda, inputs, pda_state=None, pda_stack=None):
   if len(inputs) and not inp in pda.sigma:
     raise ValueError("input not in sigma")
 
-  has_match = (pda_state, None, top(pda_stack)) in pda._del
-  has_match_ep = (pda_state, None, None) in pda._del
-  has_match_inp = inp and ((pda_state, inp, top(pda_stack)) in pda._del)
-  has_match_inp_ep = inp and ((pda_state, inp, None) in pda._del)
+  matchers = [
+    (pda_state, None, None),
+    (pda_state, None, top(pda_stack)),
+    (pda_state, inp, None),
+    (pda_state, inp, top(pda_stack))
+  ]
+  
+  for matcher in matchers:
+    if not matcher in pda._del:
+      continue
+    if inp is None and matcher[1] is not None:
+      continue
 
-  if has_match:
-    pda_state_new, stack_changes = pda._del[(pda_state, None, top(pda_stack))]
-    pda_stack_new = pda_stack[:-1] + stack_changes
-    if run_pda_nondeterministic(pda, list(inputs).copy(), pda_state_new, pda_stack_new):
-      return True
+    stack_input = pda_stack if matcher[2] is None else pda_stack[:-1]
+    remaining_inputs = inputs if matcher[1] is None else inputs[1:]
 
-  if has_match_ep:
-    pda_state_new, stack_changes = pda._del[(pda_state, None, None)]
-    pda_stack_new = pda_stack + stack_changes
-    if run_pda_nondeterministic(pda, list(inputs).copy(), pda_state_new, pda_stack_new):
-      return True
-
-  if has_match_inp:
-    pda_state_new, stack_changes = pda._del[(pda_state, inp, top(pda_stack))]
-    pda_stack_new = pda_stack[:-1] + stack_changes
-    if run_pda_nondeterministic(pda, inputs[1:], pda_state_new, pda_stack_new):
-      return True
-
-  if has_match_inp_ep:
-    pda_state_new, stack_changes = pda._del[(pda_state, inp, None)]
-    pda_stack_new = pda_stack + stack_changes
-    if run_pda_nondeterministic(pda, inputs[1:], pda_state_new, pda_stack_new):
+    pda_state_new, stack_changes = pda._del[matcher]
+    pda_stack_new = stack_input + stack_changes
+    if run_pda_nondeterministic(pda, remaining_inputs, pda_state_new, pda_stack_new):
       return True
 
   return False
@@ -191,7 +183,7 @@ if __name__ == '__main__':
   # print(f'ABBA: {output}')
 
   # ABBA nondeterministic example
-  example_input = "aaabbaaa"
+  example_input = "aaabbbaaa"
   output = run_pda_nondeterministic(abba_nondeterministic(), example_input)
   print(f'ABBA: {output}')
 
