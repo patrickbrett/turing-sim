@@ -26,6 +26,9 @@ def top(stack):
   return stack[-1] if len(stack) else None
 
 
+"""
+iterative solution - only supports deterministic PDAs
+"""
 def run_pda(pda, inputs):
   pda_state = pda.q0
   pda_stack = [pda.z0]
@@ -64,6 +67,9 @@ def run_pda(pda, inputs):
   return pda_state in pda.F
 
 
+"""
+recursive solution - supports nondeterministic and deterministic PDAs
+"""
 def run_pda_nondeterministic(pda, inputs, pda_state=None, pda_stack=None):
   if pda_state is None:
     pda_state = pda.q0
